@@ -40,25 +40,27 @@ class Server:
         return self.__indexed_dataset
 
     def get_hyper_index(self, index: int = None, page_size: int = 10) -> Dict:
-        pass
+        """Get hyper index"""
+        assert type(index) == int and type(page_size) == int\
+            and index > 0 and page_size > 0
+        assert index <= len(self.indexed_dataset())
         dataset = self.indexed_dataset()
-        data_length = len(dataset)
-        assert 0 <= index < data_length
-        response = {}
+        # print(dataset.keys())
         data = []
-        response['index'] = index
-        for i in range(page_size):
-            while True:
-                curr = dataset.get(index)
-                index += 1
-                if curr is not None:
-                    break
-            data.append(curr)
-
-        response['data'] = data
-        response['page_size'] = len(data)
-        if dataset.get(index):
-            response['next_index'] = index
-        else:
-            response['next_index'] = None
-        return response
+        next_index = index + page_size
+        i = index
+        while i < next_index:
+            if i in dataset.keys():
+                data.append(dataset[i])
+            else:
+                next_index += 1
+            i += 1
+        # for i in range(index, index + page_size):
+        #     # print(i)
+        #     data.append(self.indexed_dataset()[i])
+        return {
+            'index': index,
+            'data': data,
+            'page_size': page_size,
+            'next_index': next_index
+        }
