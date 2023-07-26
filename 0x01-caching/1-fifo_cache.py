@@ -7,6 +7,8 @@ from base_caching import BaseCaching
 
 class FIFOCache(BaseCaching):
     """FIFO caching"""
+    def __init__(self) -> None:
+        super().__init__()
 
     def put(self, key, value):
         """Insert a value in the caching system"""
@@ -24,5 +26,6 @@ class FIFOCache(BaseCaching):
     def get(self, key):
         """Retrieve a value from the caching system"""
         if not key:
+            return self.cache_data[key]
             return None
 
