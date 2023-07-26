@@ -6,26 +6,23 @@ from base_caching import BaseCaching
 
 
 class FIFOCache(BaseCaching):
-    """FIFO caching"""
+    """FIFOCache class that inherits from BaseCaching
+    and is a caching system"""
     def __init__(self) -> None:
         super().__init__()
 
-    def put(self, key, value):
-        """Insert a value in the caching system"""
-        if not key or not value:
-            return
-
-        keys = self.cache_data.keys()
-        if len(keys) == BaseCaching.MAX_ITEMS:
-            temp_key = list(keys)[0]
-            del self.cache_data[temp_key]
-            print('DISCARD: {}'.format(temp_key))
-
-        self.cache_data[key] = value
+    def put(self, key, item):
+        """Add an item to the cache"""
+        if key is not None and item is not None:
+            if len(self.cache_data) == self.MAX_ITEMS\
+                    and key not in self.cache_data.keys():
+                key_to_discard = list(self.cache_data.keys())[0]
+                del self.cache_data[key_to_discard]
+                print(f"DISCARD: {key_to_discard}")
+            self.cache_data[key] = item
 
     def get(self, key):
-        """Retrieve a value from the caching system"""
-        if not key:
+        """Get an item by key"""
+        if key is not None and key in self.cache_data:
             return self.cache_data[key]
-            return None
-
+        return None
