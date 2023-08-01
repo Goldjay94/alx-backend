@@ -1,13 +1,22 @@
 #!/usr/bin/env python3
 """5-app module"""
-from flask import (
-    Flask,
-    render_template,
-    request,
-    g
-)
-from flask_babel import Babel
+from flask_babel import Babel, _
+from flask import Flask, render_template, request, g
+from typing import Union
 
+app = Flask(__name__, template_folder='templates')
+babel = Babel(app)
+
+
+class Config(object):
+    """ Configuration Class for Babel """
+
+    LANGUAGES = ['en', 'fr']
+    BABEL_DEFAULT_LOCALE = 'en'
+    BABEL_DEFAULT_TIMEZONE = 'UTC'
+
+
+app.config.from_object(Config)
 
 users = {
     1: {"name": "Balou", "locale": "fr", "timezone": "Europe/Paris"},
@@ -17,58 +26,42 @@ users = {
 }
 
 
-class Config(object):
+def get_user() -> Union[dict, None]:
+    """ Returns a user dictionary or
+    None if the ID cannot be found or
+    if login_as was not passed.
     """
-    Configuration for Babel
-    """
-    LANGUAGES = ["en", "fr"]
-    BABEL_DEFAULT_LOCALE = "en"
-    BABEL_DEFAULT_TIMEZONE = "UTC"
 
+    try:
+        login_as = request.args.get("login_as")
+        user = users[int(login_as)]
+    except Exception:
+        user = None
 
-app = Flask(__name__)
-app.config.from_object(Config)
-babel = Babel(app)
-
-
-def get_user():
-    """
-    Returns a user dictionary or None if ID value can't be found
-    or if 'login_as' URL parameter was not found
-    """
-    id = request.args.get('login_as', None)
-    if id is not None and int(id) in users.keys():
-        return users.get(int(id))
-    return None
+    return user
 
 
 @app.before_request
 def before_request():
-    """
-    Add user to flask.g if user is found
-    """
+    """ Operations that happen before any request """
     user = get_user()
     g.user = user
 
 
+@app.route('/', methods=['GET'], strict_slashes=False)
+def hello_world() -> str:
+    """Renders a Basic Template for Babel Implementation"""
+    return render_template("5-index.html")
+
+
 @babel.localeselector
-def get_locale():
-    """
-    Select and return best language match based on supported languages
-    """
-    loc = request.args.get('locale')
-    if loc in app.config['LANGUAGES']:
-        return loc
+def get_locale() -> str:
+    """Select a language translation to use for that request"""
+    locale = request.args.get("locale")
+    if locale and locale in app.config['LANGUAGES']:
+        return locale
     return request.accept_languages.best_match(app.config['LANGUAGES'])
 
 
-@app.route('/', strict_slashes=False)
-def index() -> str:
-    """
-    Handles / route
-    """
-    return render_template('5-index.html')
-
-
 if __name__ == "__main__":
-    app.run(port="5000", host="0.0.0.0", debug=True)
+    app.run()
