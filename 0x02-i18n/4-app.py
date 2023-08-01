@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """ 4-app module """
-from flask_babel import Babel,
+from flask_babel import Babel, _
 from flask import Flask, render_template, request, flash
 
 app = Flask(__name__, template_folder='templates')
