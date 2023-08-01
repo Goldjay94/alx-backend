@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
-""" 2-app module """
-
-from flask import Flask, request
+"""
+Flask app
+"""
+from flask import (
+    Flask,
+    render_template,
+    request
+)
 from flask_babel import Babel
-from routes.routes_2 import app_routes
-from config import Config
 
 
 class Config(object):
@@ -17,17 +20,16 @@ class Config(object):
 
 
 app = Flask(__name__)
-babel = Babel(app)
-
 app.config.from_object(Config)
-app.register_blueprint(app_routes)
+babel = Babel(app)
 
 
 @babel.localeselector
-def get_locale() -> str:
-    """ Determine best match for supported languages
+def get_locale():
     """
-    return request.accept_languages.best_match(Config.LANGUAGES)
+    Determine the best language match based on supported languages
+    """
+    return request.accept_languages.best_match(app.config['LANGUAGES'])
 
 
 @app.route('/', strict_slashes=False)
@@ -39,4 +41,4 @@ def index() -> str:
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port="5000")
+    app.run(port="5000", host="0.0.0.0", debug=True)
