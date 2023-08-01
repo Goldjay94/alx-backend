@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """ 1-app module """
+
 from flask import Flask, render_template
 from flask_babel import Babel
 
 
 class Config():
     """ Config class for Babel"""
-    LANGUAGE = ["en", "fr"]
-    BABEL_DEFAULT_LOCALE = LANGUAGE[0]
+    LANGUAGES = ["en", "fr"]
+    BABEL_DEFAULT_LOCALE = "en"
     BABEL_DEFAULT_TIMEZONE = "UTC"
 
 
